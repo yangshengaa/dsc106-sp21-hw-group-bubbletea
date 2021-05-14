@@ -1,2 +1,9 @@
 # ignore large data file
 data/
+
+# python
+.vscode/
+__pycache__/
+
+# OSX
+.DS_Store
