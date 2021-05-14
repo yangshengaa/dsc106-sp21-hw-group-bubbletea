@@ -1,0 +1,4 @@
+# ignore large data file
+data/
+
+
