@@ -24,11 +24,14 @@ to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
            ]  # words to drop, meaningless to consider by themselves
 
 
-# ------ functions --------
-# TODO: more helper methods to add, especially those for plotting
+# ------ functions for news analysis only --------
 
 def read_csv_as_txt(year):
-    """ read in the csv of a given year into a strings, and discard all "new york times" """
+    """ 
+    read in the csv of a given year into a strings, and discard all "new york times" 
+    
+    :param year: an integer, the year we are interested in loading in
+    """
     return open(news_path + f'/df_{year}.csv').read().lower().replace('new york times', '')
 
 
@@ -50,8 +53,9 @@ def count_words_by_year(year):
 def document_frequency(year, word):
     """
     compute tf_idf of a word in a given year 
+    # (not used, probably irrelevant)
 
-    :param year: the year we are interested in finding 
+    :param year: the year we are interested in exploring 
     :param word: a specific word that we are interested in computing the tf_idf 
     :return tf_idf
     """
@@ -61,14 +65,25 @@ def document_frequency(year, word):
 
 
 def plot_word_cloud_of_year(year):
-    """ make a wordcloud plot of a give year """ 
+    """ 
+    make a wordcloud plot of a give year 
+    
+    :param year: an integer, the year we are interested in loading in
+    """ 
     words_of_a_year = read_csv_as_txt(year)
     wd_plot = WordCloud(max_words=100, 
                         width=2560, height=1600,  # for better resolution
                         background_color='white', 
                         min_word_length=5  # to eliminate trivial words
                         ).generate(words_of_a_year)
+    # save to a local file 
     wd_plot.to_file(os.path.join('report', f'word_cloud_plot_{year}.png'))
+    # plot in notebook 
     plt.imshow(wd_plot, interpolation='bilinear')
     plt.axis('off')
     plt.show()
+
+
+# TODO: more helper methods to add, especially those for plotting
+
+# ------ functions for combining two dataset --------
