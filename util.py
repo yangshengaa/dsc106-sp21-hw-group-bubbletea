@@ -10,7 +10,11 @@ import os
 import re 
 import pandas as pd
 import matplotlib.pyplot as plt 
-from wordcloud import WordCloud, STOPWORDS
+import multiprocessing as mp
+
+# word processors 
+from wordcloud import WordCloud
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 # constants 
@@ -87,3 +91,11 @@ def plot_word_cloud_of_year(year):
 # TODO: more helper methods to add, especially those for plotting
 
 # ------ functions for combining two dataset --------
+def foo(a):
+    print(a)
+    return [a]
+
+if __name__ == '__main__':
+    with mp.Pool() as pool:
+        test = pool.map(foo, list(range(1920, 2020 + 1)))
+    print(test)
