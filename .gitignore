@@ -1,5 +1,6 @@
 # ignore large data file
-data/
+data/year_prediction.csv
+data/archive/
 
 # python
 .vscode/
