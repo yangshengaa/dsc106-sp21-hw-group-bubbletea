@@ -1,5 +1,5 @@
 """
-This file contains the necessary auxiliary functions to perform ploting 
+This file contains the necessary auxiliary functions to load, process, and plot data
 
 Author: Sheng Yang
 Date: 2021/05/14
@@ -9,9 +9,13 @@ Date: 2021/05/14
 import os 
 import re 
 import pandas as pd
+import matplotlib.pyplot as plt 
+from wordcloud import WordCloud, STOPWORDS
+
 
 # constants 
 news_path = 'data/archive'
+report_path = 'report'
 to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
            'is', 'are', 'was', 'were', 'am', 'be', 'as', 'has', 'had',
            'of', 'to', 'by', 'then', 'on', 'at', 'with', 'from', 'in',
@@ -21,6 +25,12 @@ to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
 
 
 # ------ functions --------
+# TODO: more helper methods to add, especially those for plotting
+
+def read_csv_as_txt(year):
+    """ read in the csv of a given year into a strings, and discard all "new york times" """
+    return open(news_path + f'/df_{year}.csv').read().lower().replace('new york times', '')
+
 
 def count_words_by_year(year):
     """ 
@@ -30,7 +40,7 @@ def count_words_by_year(year):
     :return a pandas Series value_counts by word 
     """
     # read in as a text file
-    words_of_a_year = open(news_path + f'/df_{year}.csv').read()
+    words_of_a_year = read_csv_as_txt(year)
     # count words by value counts 
     words_count = pd.Series(re.findall(r'[a-z]+', words_of_a_year.lower())).value_counts()
     # drop meaningless words 
@@ -49,4 +59,16 @@ def document_frequency(year, word):
     df = pd.read_csv(news_path + f'/df_{year}.csv', index_col=0)
     return df.sentence.str.contains(word).mean()
 
-# TODO: more helper methods to add, especially those for plotting 
+
+def plot_word_cloud_of_year(year):
+    """ make a wordcloud plot of a give year """ 
+    words_of_a_year = read_csv_as_txt(year)
+    wd_plot = WordCloud(max_words=100, 
+                        width=2560, height=1600,  # for better resolution
+                        background_color='white', 
+                        min_word_length=5  # to eliminate trivial words
+                        ).generate(words_of_a_year)
+    wd_plot.to_file(os.path.join('report', f'word_cloud_plot_{year}.png'))
+    plt.imshow(wd_plot, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
