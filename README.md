@@ -46,3 +46,11 @@ There are:
 | Text2Emotion   | Happy, Angry, Surprise, Sad, Fear | Not sure|
 
 TODO: discuss how to use these emotion
+
+
+# TODO: explore what are Timbre2 and Timbre 3 in particular 
+
+    # first dimension represents the average loudness of the segment; 
+    # second emphasizes brightness; 
+    # third is more closely correlated to the flatness of a sound
+    # fourth to sounds with a stronger attack

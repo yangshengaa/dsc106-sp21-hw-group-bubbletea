@@ -51,20 +51,20 @@ def nltk_score_for_all_years():
     pd.DataFrame(stacked_scores, index=years).to_csv('preprocess/nltk_scores_by_year.csv')
 
 
-def t2e_score_by_year(year):
-    """
-    a helper function to read in a year, sum up the t2e sentiment score  
-    """
-    print(f'Processing year {year}')
-    # read in
-    words_series = pd.read_csv(
-        news_path + f'/df_{year}.csv', usecols=['sentence'], squeeze=True)
-    # make prediction
-    score_by_news = words_series.apply(get_emotion).apply(pd.Series)
-    # sum up
-    score_sum = score_by_news.sum()
-    print(f'Finish processing year {year}')
-    return score_sum / score_sum.sum()
+# def t2e_score_by_year(year):
+#     """
+#     a helper function to read in a year, sum up the t2e sentiment score  
+#     """
+#     print(f'Processing year {year}')
+#     # read in
+#     words_series = pd.read_csv(
+#         news_path + f'/df_{year}.csv', usecols=['sentence'], squeeze=True)
+#     # make prediction
+#     score_by_news = words_series.apply(get_emotion).apply(pd.Series)
+#     # sum up
+#     score_sum = score_by_news.sum()
+#     print(f'Finish processing year {year}')
+#     return score_sum / score_sum.sum()
 
 
 # ------------- function to process timbre data -------------- 

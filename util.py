@@ -15,6 +15,7 @@ import multiprocessing as mp
 # word processors 
 from wordcloud import WordCloud
 from nltk.sentiment import SentimentIntensityAnalyzer
+from text2emotion import get_emotion
 
 
 # constants 
@@ -91,11 +92,12 @@ def plot_word_cloud_of_year(year):
 # TODO: more helper methods to add, especially those for plotting
 
 # ------ functions for combining two dataset --------
-def foo(a):
-    print(a)
-    return [a]
+
 
 if __name__ == '__main__':
-    with mp.Pool() as pool:
-        test = pool.map(foo, list(range(1920, 2020 + 1)))
-    print(test)
+    test_string = read_csv_as_txt(1920)
+    import time 
+    start = time.time()
+    print(get_emotion(test_string))
+    end = time.time()
+    print(end - start)
