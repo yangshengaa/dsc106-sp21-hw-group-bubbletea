@@ -30,10 +30,16 @@ please pip install the following python packages:
 
 - **WordCloud Tutorial**: [Generating WordClouds in Python](https://www.datacamp.com/community/tutorials/wordcloud-python)
 - **NLTK Tutorial**: [Sentiment Analysis: First Steps With Python's NLTK Library](https://realpython.com/python-nltk-sentiment-analysis/)
-- **Text2Emotion Tutorial**: [Demo](https://colab.research.google.com/drive/1sCAcIGk2q9dL8dpFYddnsUin2MlhjaRw?usp=sharing#scrollTo=nxET8yW3HIvL)
 
 Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_2000.png)
 
 ## For developers (plan)
 
 Meeting 05/17 issues:
+
+1. Maybe combine ridge plots with correlation plot? like [this](https://towardsdatascience.com/altair-plot-deconstruction-visualizing-the-correlation-structure-of-weather-data-38fb5668c5b1)
+2. Figure out how to do Ridgeline plot
+
+### For developer references
+
+- **Color Schemes**: [Available Color Schemes](https://vega.github.io/vega/docs/schemes/#reference)
