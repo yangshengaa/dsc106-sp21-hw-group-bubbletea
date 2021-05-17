@@ -12,13 +12,18 @@ please pip install the following python packages:
 `Altair`
 `NLTK`
 `WordCloud`
-`Text2Emotion`
-
-Optional: `dask`
 
 ## Data Source
 
 - **Timbre Features**: [Audio features of songs ranging from 1922 to 2011](https://www.kaggle.com/uciml/msd-audio-features?select=year_prediction.csv); [Analyzer Documentation](http://modelai.gettysburg.edu/2012/music/docs/EchoNestAnalyzeDocumentation.pdf)
+
+| Timbre Basis    | Explanation |
+| ----------- | ----------- |
+| TimbreAvg1  | average loudness of the segment  |
+| TimbreAvg2  | brightness |
+| TimbreAvg3  | more closely correlated to the flatness of a sound |
+| TimbreAvg4  | stronger attack |
+
 - **News Sentiment**: [New York Times Articles 1920-2020](https://www.kaggle.com/tumanovalexander/nyt-articles-data).
 
 ## Citation
@@ -31,26 +36,4 @@ Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_20
 
 ## For developers (plan)
 
-Meeting 05/16 issues:
-
-TODO: discuss and determine which sentiment analyzer to use (also check demo in the notebook when discussing).
-There are:
-
-- **NLTK**: mainstreamed Natural Language Toolkit, could employ a large pre-trained network for emotion classification (implies accuracy)
-- **Text2Emotion**: A light sentence emotion classifier (may not be as accurate as NLTK)
-- **AFINN**: this is a joke. It could only be classified into positive, negative, and neutral (useless)
-
-| Package      | Emotion Category Supported | Accuracy |
-| ----------- | ----------- | ----------- |
-| NLTK      | negative, neutral, positive, compound       | high |
-| Text2Emotion   | Happy, Angry, Surprise, Sad, Fear | Not sure|
-
-TODO: discuss how to use these emotion
-
-
-# TODO: explore what are Timbre2 and Timbre 3 in particular 
-
-    # first dimension represents the average loudness of the segment; 
-    # second emphasizes brightness; 
-    # third is more closely correlated to the flatness of a sound
-    # fourth to sounds with a stronger attack
+Meeting 05/17 issues:

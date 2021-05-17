@@ -5,15 +5,12 @@ Author: Sheng Yang
 Date: 2021/05/16
 """
 
-# TODO: add Text2Emotion version of this, maybe?
-
 import pandas as pd 
 import multiprocessing as mp
 
 # word processors
 from wordcloud import WordCloud
 from nltk.sentiment import SentimentIntensityAnalyzer
-from text2emotion import get_emotion
 
 # constants 
 news_path = 'data/archive'
@@ -37,6 +34,7 @@ def nltk_score_by_year(year):
     print(f'Finish processing year {year}')
     return score_sum / score_sum.sum()
 
+# TODO: modify the function below to incorporate a 'year' in front 
 
 def nltk_score_for_all_years():
     """
@@ -51,23 +49,12 @@ def nltk_score_for_all_years():
     pd.DataFrame(stacked_scores, index=years).to_csv('preprocess/nltk_scores_by_year.csv')
 
 
-# def t2e_score_by_year(year):
-#     """
-#     a helper function to read in a year, sum up the t2e sentiment score  
-#     """
-#     print(f'Processing year {year}')
-#     # read in
-#     words_series = pd.read_csv(
-#         news_path + f'/df_{year}.csv', usecols=['sentence'], squeeze=True)
-#     # make prediction
-#     score_by_news = words_series.apply(get_emotion).apply(pd.Series)
-#     # sum up
-#     score_sum = score_by_news.sum()
-#     print(f'Finish processing year {year}')
-#     return score_sum / score_sum.sum()
-
-
 # ------------- function to process timbre data -------------- 
+
+def transform_year_to_decade(year):
+    """ convert year into decade """
+    return 'd' + str(year)[2] + '0'
+
 
 def read_timbre_feature():
     """ read in timbre feature """ 
@@ -75,28 +62,25 @@ def read_timbre_feature():
     return pd.read_csv(file_path).rename(columns={'label': 'year'})
 
 
-def get_timbre_avg_by_year():  
+def prepare_timbre_avg_by_year_and_decade():  
     """ read in timbre feature and write timbre average feature by year """
+    # read in data
     timbre_cols = [f"TimbreAvg{i}" for i in range(1, 13)]
-    timbre_avgs = timbre[["year"] + timbre_cols]
-    timbre_df = read_timbre_feature()[timbre_avgs]
-    timbre_df.groupby('year').mean().to_csv('preprocess/timbre_avg_by_year.csv')
-
-
-#  def get_timbre_avg_by_decade(): 
-#     """ read in timbre feature and write timbre average feature by decade """ 
-#     # compute decades
-#     def transform_year_to_decade(year):
-#         return 'd' + str(year)[2] + '0'
-#     # transform and obtain long form data for plotting
-#     timbre_avgs['decade'] = timbre_avgs.year.transform(transform_year_to_decade)
-#     timbre_avgs_by_decade = timbre_avgs.drop(
-#         columns=['year']).groupby('decade').mean()
+    timbre_df = read_timbre_feature()[["year"] + timbre_cols]
+    # compute annual average
+    timbre_avg_by_year = timbre_df.groupby('year').mean().reset_index()
+    # append decade information 
+    timbre_avg_by_year['decade'] = timbre_avg_by_year.year.transform(transform_year_to_decade)
+    # write avg file
+    timbre_avg_by_year.to_csv('preprocess/timbre_avg_by_year.csv', index=False)
+    # write decade file 
+    timbre_avg_by_decade = timbre_avg_by_year.drop(columns=['year']).groupby('decade').mean()
+    timbre_avg_by_decade.to_csv('preprocess/timbre_avg_by_decade.csv')
 
 
 if __name__ == '__main__':
     # run the preprocessing 
     # nltk score
-    # nltk_score_for_all_years()
-    # t2e score
-    print(t2e_score_by_year(1924))
+    nltk_score_for_all_years()
+    # timbre groupby mean
+    prepare_timbre_avg_by_year_and_decade()

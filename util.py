@@ -8,14 +8,14 @@ Date: 2021/05/14
 # load packages 
 import os 
 import re 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
 import multiprocessing as mp
 
 # word processors 
 from wordcloud import WordCloud
-from nltk.sentiment import SentimentIntensityAnalyzer
-from text2emotion import get_emotion
+# from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 # constants 
@@ -27,6 +27,9 @@ to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
            'it', 'this', 'that', 'those', 'who', 'whose', 'whom', 'which',
            'his', 'he', 'her', 'she', 'they', 'them', 'their', 's'
            ]  # words to drop, meaningless to consider by themselves
+
+
+# ------ functions for timbre analysis only --------
 
 
 # ------ functions for news analysis only --------
@@ -93,11 +96,28 @@ def plot_word_cloud_of_year(year):
 
 # ------ functions for combining two dataset --------
 
+def corr_timbre_nltk():
+    """ compute the correlation between each timbre column and each nltk column """
+    # read in df 
+    timbre_avg_by_year = pd.read_csv('preprocess/timbre_avg_by_year.csv')
+    nltk_scores_by_year = pd.read_csv('preprocess/nltk_scores_by_year.csv')
+    # merge data 
+    merged_df = timbre_avg_by_year.merge(nltk_scores_by_year, on='year')
+    # compute correlation 
+    nltk_cols = ['neg', 'neu', 'pos', 'compound']
+    timbre_cols = [f'TimbreAvg{i}' for i in range(1, 13)]
+    corr_mat = []
+    for nltk_col in nltk_cols:
+        corr_row = [] 
+        for timbre_col in timbre_cols:
+            corr_row.append(
+                np.corrcoef(merged_df[timbre_col], 
+                            merged_df[nltk_col]
+                            )[0, 1]
+                            )
+        corr_mat.append(corr_row)
+    return pd.DataFrame(corr_mat, index=nltk_cols, columns=timbre_cols)
+            
 
 if __name__ == '__main__':
-    test_string = read_csv_as_txt(1920)
-    import time 
-    start = time.time()
-    print(get_emotion(test_string))
-    end = time.time()
-    print(end - start)
+    print(corr_timbre_nltk())
