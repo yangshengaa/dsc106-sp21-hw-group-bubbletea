@@ -5,6 +5,7 @@ data/archive/
 # python
 .vscode/
 __pycache__/
+.ipynb_checkpoints/
 
 # OSX
 .DS_Store
