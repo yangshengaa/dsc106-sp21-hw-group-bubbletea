@@ -53,7 +53,7 @@ def nltk_score_for_all_years():
 
 def transform_year_to_decade(year):
     """ convert year into decade """
-    return 'd' + str(year)[2] + '0'
+    return ("d" + str(year)[2] + '0')
 
 
 def read_timbre_feature():
