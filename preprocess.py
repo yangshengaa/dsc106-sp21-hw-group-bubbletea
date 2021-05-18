@@ -34,7 +34,6 @@ def nltk_score_by_year(year):
     print(f'Finish processing year {year}')
     return score_sum / score_sum.sum()
 
-# TODO: modify the function below to incorporate a 'year' in front 
 
 def nltk_score_for_all_years():
     """
@@ -46,7 +45,7 @@ def nltk_score_for_all_years():
     with mp.Pool() as pool:
         stacked_scores = pool.map(nltk_score_by_year, years)  # use map to ensure sequence
     # write to disk 
-    pd.DataFrame(stacked_scores, index=years).to_csv('preprocess/nltk_scores_by_year.csv')
+    pd.DataFrame(stacked_scores, index=years).reset_index().to_csv('preprocess/nltk_scores_by_year.csv', index=False)
 
 
 # ------------- function to process timbre data -------------- 

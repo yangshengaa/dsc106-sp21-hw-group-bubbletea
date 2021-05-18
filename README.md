@@ -44,3 +44,6 @@ Meeting 05/17 issues:
 ### For developer references
 
 - **Color Schemes**: [Available Color Schemes](https://vega.github.io/vega/docs/schemes/#reference)
+
+
+### Task assignment
