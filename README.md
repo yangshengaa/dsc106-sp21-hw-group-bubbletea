@@ -40,4 +40,4 @@ Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_20
 
 - **Color Schemes**: [Available Color Schemes](https://vega.github.io/vega/docs/schemes/#reference)
 
-TODO: add photos to attract people to take a look. 
+TODO: add photos to attract people to take a look.
