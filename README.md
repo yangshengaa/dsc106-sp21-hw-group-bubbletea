@@ -33,13 +33,6 @@ please pip install the following python packages:
 
 Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_2000.png)
 
-## For developers (plan)
-
-Meeting 05/17 issues:
-
-1. Maybe combine ridge plots with correlation plot? like [this](https://towardsdatascience.com/altair-plot-deconstruction-visualizing-the-correlation-structure-of-weather-data-38fb5668c5b1)
-2. Fix the Ridgeline plot
-3. Saving plot in png is probably not good; need html instead
 
 ### For developer references
 

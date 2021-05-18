@@ -33,16 +33,16 @@ timbre_cols = [f'TimbreAvg{i}' for i in range(1, 13)]
 
 # ------ functions for news analysis only --------
 
-def read_csv_as_txt(year):
+def read_csv_as_txt(path):
     """ 
     read in the csv of a given year into a strings, and discard all "new york times" 
     
     :param year: an integer, the year we are interested in loading in
     """
-    return open(news_path + f'/df_{year}.csv').read().lower().replace('new york times', '')
+    return open(path).read().lower().replace('new york times', '')
 
 
-def count_words_by_year(year):
+def count_words_by_year(path):
     """ 
     load in csv of a specific year and perform value count
 
@@ -50,28 +50,39 @@ def count_words_by_year(year):
     :return a pandas Series value_counts by word 
     """
     # read in as a text file
-    words_of_a_year = read_csv_as_txt(year)
+    words_of_a_year = read_csv_as_txt(path)
     # count words by value counts 
     words_count = pd.Series(re.findall(r'[a-z]+', words_of_a_year.lower())).value_counts()
     # drop meaningless words 
     return words_count.drop(index=to_drop)
 
 
-def plot_word_cloud_of_year(year):
+def plot_word_cloud_of_year(path):
     """ 
-    make a wordcloud plot of a give year 
+    make a wordcloud plot of a give year (for demo only)
     
     :param year: an integer, the year we are interested in loading in
     """ 
-    words_of_a_year = read_csv_as_txt(year)
+    words_of_a_year = read_csv_as_txt(path)
     wd_plot = WordCloud(max_words=100, 
                         width=2560, height=1600,  # for better resolution
                         background_color='white', 
                         min_word_length=5  # to eliminate trivial words
                         ).generate(words_of_a_year)
     # save to a local file 
-    wd_plot.to_file(os.path.join('report', f'word_cloud_plot_{year}.png'))
+    wd_plot.to_file(os.path.join('report', 'word_cloud_plot_1920.png'))
     # plot in notebook 
+    plt.imshow(wd_plot, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
+
+
+def generate_demo_sentiment_word_cloud():
+    """ make a word cloud on four words (negative, neutral, positive, compound) only """
+    sample_sentiments = 'negative negative, neutral, neutral' + \
+        ' neutral positive positive positive positive positive compound compound'
+    wd_plot = WordCloud(width=1200, height=800,  # for better resolution
+                        background_color='white').generate(sample_sentiments)
     plt.imshow(wd_plot, interpolation='bilinear')
     plt.axis('off')
     plt.show()
@@ -123,14 +134,65 @@ def corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year):
 # TODO: plots needed include TimbreAvg1
 # def ...
 
+def visualize_corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year): 
+    """ visualize the correlation above """
+    corr_mat = corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year)
+    corr_mat_long = corr_mat.reset_index().melt('index', var_name="Timbre Avg",
+                                                value_name="Correlation").rename(columns={'index': 'sentiment'})
+    corr_mat_long['Correlation'] = corr_mat_long.Correlation.round(2) # round to 2 decimal places for good display
+    return alt.Chart(corr_mat_long).mark_rect().encode(
+        y=alt.Y('sentiment:O', sort=sentiment_cat),
+        x=alt.X('Timbre Avg:O', sort=timbre_cols),
+        tooltip=['sentiment', 'Timbre Avg', 'Correlation'],
+        color=alt.Color('Correlation:Q', scale=alt.Scale(scheme="redblue"))
+    ).properties(
+        title='Correlation Between Timbre Avgs and Sentiment',
+        width=800, height=240
+    )
 
-def visualize_agg_plot(timbre_avg_by_year, nltk_scores_by_year, corr_mat_long):
+
+def visualize_timbre_nltk_regression(timbre_avg_by_year, nltk_scores_by_year):
+    """ for demo purpose only """ 
+    # merge dataframes 
+    merged_df = timbre_avg_by_year.merge(nltk_scores_by_year, on='year')
+    merged_df['decade'] = (
+        (merged_df['year'] / 10).astype(int) * 10).astype(str) + 's'
+    
+    # make a scatter plot 
+    selection = alt.selection_multi(fields=['decade'])
+    color = alt.condition(selection,
+                        alt.Color('decade:N', legend=None,
+                                    scale=alt.Scale(scheme='magma')),
+                        alt.value('lightgray'))
+
+    scatter = alt.Chart(merged_df).mark_point().encode(
+        x=alt.X('neg:Q', scale=alt.Scale(zero=False), axis=alt.Axis(grid=False)),
+        y=alt.Y('TimbreAvg3:Q', axis=alt.Axis(grid=False)),
+        color=color,
+        tooltip=['year', 'neg', 'TimbreAvg3']
+    ).properties(
+        title='Annual Average Timbre Feature and Negative Sentiment'
+    )
+    legend = alt.Chart(merged_df).mark_rect().encode(
+        y=alt.Y('decade:N', axis=alt.Axis(orient='right')),
+        color=color
+    ).add_selection(selection)
+    return (scatter + scatter.transform_regression('neg', 'TimbreAvg3').mark_line()
+    .encode(strokeDash=alt.value([5, 5]), color=alt.value('darkblue'))) | legend
+
+
+def visualize_agg_plot(timbre_avg_by_year, nltk_scores_by_year):
     """ 
     this function makes the aggregate plot that helps select each year for individual checking
 
     :param timbre_avg_by_year: the df read in directly from preprocess 
     :param nltk_scores_by_year: the df read in directly from preprocess
     """
+    corr_mat = corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year)
+    corr_mat_long = corr_mat.reset_index().melt('index', var_name="Timbre Avg",
+                                                value_name="Correlation").rename(columns={'index': 'sentiment'})
+    corr_mat_long['Correlation'] = corr_mat_long.Correlation.round(
+        2)  # round to 2 decimal places for good display
     # process data
     timbre_avg_by_year['decade'] = (
         (timbre_avg_by_year.year / 10).astype(int) * 10).astype(str) + 's'

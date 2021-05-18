@@ -1,5 +1,8 @@
 """
-this file gets emotion/sentiment prepared for each year   
+RUNNING THIS FILE IS NOT MANDATORY. ALL PREPROCESSED FILE ARE CONTAINED IN FOLDER preprocess. 
+this is only for your reference on how preprocessed data are obtained from downloaded dataset.
+
+This file gets emotion/sentiment prepared for each year   
 
 Author: Sheng Yang 
 Date: 2021/05/16
