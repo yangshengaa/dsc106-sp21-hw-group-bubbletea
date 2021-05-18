@@ -1,7 +1,7 @@
 """
 This file contains the necessary auxiliary functions to load, process, and plot data
 
-Author: Sheng Yang
+Author: Jasmine Guan and Sheng Yang
 Date: 2021/05/14
 """
 
@@ -27,9 +27,6 @@ to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
            'it', 'this', 'that', 'those', 'who', 'whose', 'whom', 'which',
            'his', 'he', 'her', 'she', 'they', 'them', 'their', 's'
            ]  # words to drop, meaningless to consider by themselves
-
-
-# ------ functions for timbre analysis only --------
 
 
 # ------ functions for news analysis only --------
@@ -94,7 +91,26 @@ def plot_word_cloud_of_year(year):
 
 # TODO: more helper methods to add, especially those for plotting
 
-# ------ functions for combining two dataset --------
+# ------ functions for both dataset --------
+
+def transform_year_to_decade(year):
+    """ 
+    convert year into decade string, e.g. 'd10' means 1910s, and 'd00' means 2000s 
+
+    :param year: a year integer to be converted 
+    """
+    return ("d" + str(year)[2] + '0')
+
+
+def transform_year_to_decade_start(year):
+    """ 
+    convert year into decade start, e.g. 1925 -> 1920. 
+    This function is catered to Ridgeline plot implementation. 
+
+    :param year: the year to be converted 
+    """
+    return int(year / 10) * 10
+
 
 def corr_timbre_nltk():
     """ compute the correlation between each timbre column and each nltk column """
@@ -118,6 +134,13 @@ def corr_timbre_nltk():
         corr_mat.append(corr_row)
     return pd.DataFrame(corr_mat, index=nltk_cols, columns=timbre_cols)
             
+
+# TODO: add ridgeline plot function here
+# TODO: modify function comment 
+# TODO: probably accept some positional argument to adjust colors? (manual adding is fine)
+# TODO: plots needed include TimbreAvg1
+# def ...
+
 
 if __name__ == '__main__':
     print(corr_timbre_nltk())
