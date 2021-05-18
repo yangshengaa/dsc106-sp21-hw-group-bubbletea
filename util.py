@@ -11,7 +11,7 @@ import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
-import multiprocessing as mp
+import altair as alt
 
 # word processors 
 from wordcloud import WordCloud
@@ -27,6 +27,8 @@ to_drop = ['a', 'an', 'the', 'and', 'so', 'therefore', 'for',
            'it', 'this', 'that', 'those', 'who', 'whose', 'whom', 'which',
            'his', 'he', 'her', 'she', 'they', 'them', 'their', 's'
            ]  # words to drop, meaningless to consider by themselves
+sentiment_cat = ['neg', 'neu', 'pos', 'compund']
+timbre_cols = [f'TimbreAvg{i}' for i in range(1, 13)]
 
 
 # ------ functions for news analysis only --------
@@ -55,20 +57,6 @@ def count_words_by_year(year):
     return words_count.drop(index=to_drop)
 
 
-def document_frequency(year, word):
-    """
-    compute tf_idf of a word in a given year 
-    # (not used, probably irrelevant)
-
-    :param year: the year we are interested in exploring 
-    :param word: a specific word that we are interested in computing the tf_idf 
-    :return tf_idf
-    """
-    # read in csv 
-    df = pd.read_csv(news_path + f'/df_{year}.csv', index_col=0)
-    return df.sentence.str.contains(word).mean()
-
-
 def plot_word_cloud_of_year(year):
     """ 
     make a wordcloud plot of a give year 
@@ -93,6 +81,13 @@ def plot_word_cloud_of_year(year):
 
 # ------ functions for both dataset --------
 
+def read_avg_by_year():
+    """ read in average features by year """
+    timbre_avg_by_year = pd.read_csv('preprocess/timbre_avg_by_year.csv')
+    nltk_scores_by_year = pd.read_csv('preprocess/nltk_scores_by_year.csv')
+    return timbre_avg_by_year, nltk_scores_by_year
+
+
 def transform_year_to_decade(year):
     """ 
     convert year into decade string, e.g. 'd10' means 1910s, and 'd00' means 2000s 
@@ -102,21 +97,8 @@ def transform_year_to_decade(year):
     return ("d" + str(year)[2] + '0')
 
 
-def transform_year_to_decade_start(year):
-    """ 
-    convert year into decade start, e.g. 1925 -> 1920. 
-    This function is catered to Ridgeline plot implementation. 
-
-    :param year: the year to be converted 
-    """
-    return int(year / 10) * 10
-
-
-def corr_timbre_nltk():
+def corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year):
     """ compute the correlation between each timbre column and each nltk column """
-    # read in df 
-    timbre_avg_by_year = pd.read_csv('preprocess/timbre_avg_by_year.csv')
-    nltk_scores_by_year = pd.read_csv('preprocess/nltk_scores_by_year.csv')
     # merge data 
     merged_df = timbre_avg_by_year.merge(nltk_scores_by_year, on='year')
     # compute correlation 
@@ -142,5 +124,83 @@ def corr_timbre_nltk():
 # def ...
 
 
-if __name__ == '__main__':
-    print(corr_timbre_nltk())
+def visualize_agg_plot(timbre_avg_by_year, nltk_scores_by_year, corr_mat_long):
+    """ 
+    this function makes the aggregate plot that helps select each year for individual checking
+
+    :param timbre_avg_by_year: the df read in directly from preprocess 
+    :param nltk_scores_by_year: the df read in directly from preprocess
+    """
+    # process data
+    timbre_avg_by_year['decade'] = (
+        (timbre_avg_by_year.year / 10).astype(int) * 10).astype(str) + 's'
+    timbre_long = timbre_avg_by_year.melt(
+        ['decade', 'year'], var_name='Timbre Avg', value_name='Timbre Avg Value')
+
+    nltk_scores_by_year['decade'] = (
+        (nltk_scores_by_year.year / 10).astype(int) * 10).astype(str) + 's'
+    nltk_long = nltk_scores_by_year.melt(
+        ['decade', 'year'], var_name='sentiment', value_name='sentiment value')
+
+    timbre_nltk_long = timbre_long.merge(nltk_long, on=['decade', 'year'])
+
+    # set up selector
+    var_sel_cor = alt.selection_single(fields=['sentiment', 'Timbre Avg'], clear=True,
+                                    init={'sentiment': 'neg', 'Timbre Avg': 'TimbreAvg3'})
+
+    # set up correlation heat map as the base
+    base = alt.Chart(corr_mat_long).mark_rect().encode(
+        y=alt.Y('sentiment:O', sort=sentiment_cat),
+        x=alt.X('Timbre Avg:O', sort=timbre_cols),
+        tooltip=['sentiment', 'Timbre Avg', 'Correlation'],
+        color=alt.condition(var_sel_cor, alt.value('gray'), alt.Color(
+            'Correlation:Q', scale=alt.Scale(scheme='redblue')))
+    ).properties(
+        title='Correlation Between Timbre Avgs and Sentiment',
+        width=800, height=240
+    ).add_selection(var_sel_cor)
+
+    # add text
+    text = alt.Chart(corr_mat_long).encode(
+        y=alt.Y('sentiment:O', sort=sentiment_cat),
+        x=alt.X('Timbre Avg:O', sort=timbre_cols)
+    ).mark_text().encode(
+        text='Correlation',
+        color=alt.condition(
+            abs(alt.datum['Correlation']) > 0.5,
+            alt.value('white'),
+            alt.value('black')
+        )
+    )
+
+    # set up selected scatter plot
+    selection = alt.selection_multi(fields=['decade'])
+    color = alt.condition(selection,
+                        alt.Color('decade:N', legend=None, scale=alt.Scale(scheme='magma')
+                                    ),
+                        alt.value('lightgray'))
+
+    scat_plot = alt.Chart(timbre_nltk_long).transform_filter(
+        var_sel_cor
+    ).mark_point().encode(
+        x=alt.X('sentiment value:Q', scale=alt.Scale(
+            zero=False), axis=alt.Axis(grid=False)),
+        y=alt.Y('Timbre Avg Value:Q', axis=alt.Axis(grid=False)),
+        color=color
+    ).properties(
+        title='Scatter Plot between Sentiment and Timbre Avgs',
+        width=790, height=400
+    )
+
+    # set up selection
+    legend = alt.Chart(timbre_nltk_long).transform_filter(
+        var_sel_cor
+    ).mark_rect().encode(
+        y=alt.Y('decade:N', axis=alt.Axis(orient='right')),
+        color=color
+    ).add_selection(selection)
+
+    return alt.vconcat((base + text),
+                (scat_plot + scat_plot.transform_regression('sentiment value', 'Timbre Avg Value').mark_line().encode(
+                    strokeDash=alt.value([5, 5]), color=alt.value('darkblue')
+                )) | legend)
