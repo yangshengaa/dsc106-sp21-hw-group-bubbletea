@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
 import altair as alt
+import datetime
+from vega_datasets import data
 
 # word processors 
 from wordcloud import WordCloud
@@ -128,11 +130,71 @@ def corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year):
     return pd.DataFrame(corr_mat, index=nltk_cols, columns=timbre_cols)
             
 
-# TODO: add ridgeline plot function here
-# TODO: modify function comment 
-# TODO: probably accept some positional argument to adjust colors? (manual adding is fine)
+def year_to_decade_datetime(year):
+    """ convert year into decade in for the format that can be recognized as datetime object"""
+    return str(year)[:3] + "0"
+
+
+def transform_date(year): 
+    """ transform year to it's datetime object, auto-filling in January 1st"""
+    return datetime.datetime.strptime(str(year), "%Y")
+
+
+def plot_ridgeline(input_df, time_unit_field, value_col):
+    """ graph ridgeline plot of given dataframe, time unit field and value column"""
+    df = input_df.copy()
+    df[time_unit_field] = df[time_unit_field].apply(transform_date)
+    step = 30   # adjust height of each kde
+    overlap = 1
+    to_transform = 'mean(' + value_col + ')'
+    ridgeline = alt.Chart(df, height=step).transform_timeunit(
+        as_ = "Decade", timeUnit="year", field=time_unit_field
+    ).transform_joinaggregate(
+        mean_val=to_transform, groupby=["Decade"]
+    ).transform_bin(
+        ['bin_max', 'bin_min'], value_col, bin=alt.Bin(maxbins=10)
+    ).transform_aggregate(
+        value='count()', groupby=["Decade", 'mean_val', 'bin_min', 'bin_max']
+    ).transform_impute(
+        impute='value', groupby=['Decade', 'mean_val'], key='bin_min', value=0
+    ).mark_area(
+        interpolate='monotone',
+        fillOpacity=0.8,
+        stroke='lightgray',
+        strokeWidth=0.5
+    ).encode(
+        alt.X('bin_min:Q', bin='binned', title='Timbre 2 Average By Decades'),
+        alt.Y(
+            'value:Q',
+            scale=alt.Scale(range=[step, -step * overlap]),   
+            axis=None
+        ),
+        alt.Fill(
+            'mean_val:Q',
+            legend=None,
+            scale=alt.Scale(domain=[50, -100], scheme='redyellowblue')  # adjust color 
+        )
+    ).facet(
+        row=alt.Row(
+            'Decade:T',    # only accepts T type: convert things to T type first 
+            title=None,
+            header=alt.Header(labelAngle=0, labelAlign='right', format='%Y'+"s")
+        )
+    ).properties(
+        title='Timbre Avg by Decade (Ridgeline)',
+        bounds='flush'
+    ).configure_facet(
+        spacing=0
+    ).configure_view(
+        stroke=None
+    ).configure_title(
+        anchor='end'
+    )
+    return ridgeline
+
+
 # TODO: plots needed include TimbreAvg1
-# def ...
+
 
 def visualize_corr_timbre_nltk(timbre_avg_by_year, nltk_scores_by_year): 
     """ visualize the correlation above """
