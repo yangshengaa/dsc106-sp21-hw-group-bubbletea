@@ -90,8 +90,6 @@ def generate_demo_sentiment_word_cloud():
     plt.show()
 
 
-# TODO: more helper methods to add, especially those for plotting
-
 # ------ functions for both dataset --------
 
 def read_avg_by_year():
