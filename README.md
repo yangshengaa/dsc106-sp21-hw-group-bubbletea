@@ -4,7 +4,15 @@ UCSD DSC 106 SP21 Project by Jasmine Guan and Sheng Yang
 
 ## Overview
 
-Music has been a channel for artists to express social sentiments for long, but how are they correlated in effect? In this data visualization project, we are interested in **exploring the correlation between music timbre and news sentiment from 1920-2020**.  
+Music has been a channel for artists to express social sentiments for long, but how are they correlated in effect?
+
+In this data visualization project, we are interested in **exploring the correlation between music timbre and news sentiment from 1920-2020**. In particular, we are interested in answering the following two questions:
+
+1. How strong/weak a correlation do we have between music timbre and different sentiments? For example, could we expect a period with more negative sentiments expressed to have music characterized by a flatter timbre?  
+2. Does the correlation change overtime? If the correlation is strong, is it strong consistently across the entire 90 years?  
+
+The following is a quick demo of the final data visualization. If you are interested in how this plot is made and how conclusions are derived to answer the questions above, please read the following for more detailed explanation.
+![vis demo](report/timbre_sentiment_vis_demo.gif)
 
 ## Dependencies
 
