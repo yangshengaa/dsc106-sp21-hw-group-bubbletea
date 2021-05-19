@@ -40,4 +40,28 @@ Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_20
 
 - **Color Schemes**: [Available Color Schemes](https://vega.github.io/vega/docs/schemes/#reference)
 
+### File Digestion
+
+- **data**: 
+    - year_prediction.csv: data for Timbre analysis
+    - archive: NYT article titles from 1920 to 2020
+- **preprocess**: filtered and reconstructed datasets for easier manipulation
+    - df_1920_sample.csv: can explore natural language processing with this file
+    - nltk_scores_by_year.csv: pre-computed annual nltk scores
+    - timbre_avg_by_decade.csv: grouped timbre observations into decades and computed average
+    - timbre_avg_by_year.csv: grouped timbre observations into years and computed average
+- **preprocess.py**: how emotion/sentiment prepared for each year
+    - how preprocessed data are obtained from downloaded dataset
+    - running this file is not mandatory
+- **util.py**: necessary auxiliary functions to load, process, and plot data
+    - plot word clouds
+    - transform temporal data to datetime objects
+    - plot correlation between Timbre and Sentiment
+    - plot ridgeline
+    - final visualization
+- **report**: store images for presentation and report
+- **report.ipynb**: final report
+    - containing introduction, our hypothesis, exploratory data analysis, important visualizations, observations and conclusions
+- **report.html**: directly read our report
+
 TODO: add photos to attract people to take a look.
