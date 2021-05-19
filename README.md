@@ -63,5 +63,3 @@ Example: Word Cloud in year 2000 ![Word Cloud in 2000](report/word_cloud_plot_20
 - **report.ipynb**: final report
     - containing introduction, our hypothesis, exploratory data analysis, important visualizations, observations and conclusions
 - **report.html**: directly read our report
-
-TODO: add photos to attract people to take a look.
