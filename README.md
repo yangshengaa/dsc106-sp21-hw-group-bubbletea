@@ -11,8 +11,11 @@ In this data visualization project, we are interested in **exploring the correla
 1. How strong/weak a correlation do we have between music timbre and different sentiments? For example, could we expect a period with more negative sentiments expressed to have music characterized by a flatter timbre?  
 2. Does the correlation change overtime? If the correlation is strong, is it strong consistently across the entire 90 years?  
 
-The following is a quick demo of the final data visualization. If you are interested in how this plot is made and how conclusions are derived to answer the questions above, please read the following for more detailed explanation.
-![vis demo](report/timbre_sentiment_vis_demo.gif)
+The following is a quick demo of the final data visualization. If you are interested in how this plot is made and how conclusions are derived to answer the questions above, please read the following for more detailed explanation.  
+
+<p align='center'>
+  <img src="report/timbre_sentiment_vis_demo.gif" alt="vis demo" width=420 height=300>
+</p>
 
 ## Dependencies
 
