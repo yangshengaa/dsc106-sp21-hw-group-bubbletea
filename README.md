@@ -1,4 +1,4 @@
-# dsc106-sp21-hw-group-bubbletea
+# Music Timbre and News Sentiment
 
 UCSD DSC 106 SP21 Project by Jasmine Guan and Sheng Yang
 
